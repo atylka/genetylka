@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tylka Genealogical Log — Family Parish Register</title>
+<style>
+:root{
+  --paper:#eee2c5; --paper-light:#f7efdD; --paper-deep:#dfcda7;
+  --ink:#35251a; --ink-soft:#5e4935; --faded:#8b7559; --rule:#b7a17d;
+  --rule-dark:#806747; --brown:#6b4a2f; --brown-dark:#3d2a1d;
+  --red-ink:#7b3d31; --shadow:rgba(50,34,20,.14);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+ margin:0;color:var(--ink);font-family:Georgia,"Palatino Linotype","Book Antiqua",serif;
+ background-color:#d8c7a5;
+ background-image:repeating-linear-gradient(0deg,rgba(83,57,31,.025) 0,rgba(83,57,31,.025) 1px,transparent 1px,transparent 4px);
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:var(--brown-dark)}
+.page{max-width:1120px;margin:24px auto;padding:0 18px}
+.sheet{
+ position:relative;background:var(--paper-light);border:1px solid var(--rule-dark);
+ box-shadow:0 4px 18px var(--shadow);padding:clamp(18px,3vw,34px);
+}
+.sheet:before{content:"";position:absolute;inset:7px;border:1px solid rgba(128,103,71,.45);pointer-events:none}
+.masthead{text-align:center;padding:10px 14px 20px;border-bottom:3px double var(--rule-dark);position:relative}
+.kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;color:var(--faded)}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:normal;letter-spacing:.035em;margin:10px 0 6px;color:var(--brown-dark)}
+.subtitle{font-style:italic;color:var(--ink-soft);font-size:1rem;margin:0}
+.ornament{color:var(--brown);font-size:1rem;letter-spacing:.4em;margin:9px 0}
+.topline{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin:17px 0 22px}
+.small-note{font-size:.8rem;color:var(--faded);font-style:italic}
+.btn{
+ border:1px solid var(--rule-dark);background:#e8d8b7;color:var(--brown-dark);
+ padding:9px 13px;border-radius:2px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);
+ font-size:.88rem;letter-spacing:.025em
+}
+.btn:hover{background:#dfc99f}
+.btn.primary{background:var(--brown);color:#fff4dd;border-color:var(--brown-dark)}
+.btn.primary:hover{background:#573a25}
+.btn.quiet{background:transparent}
+.btn.danger{color:#7b2e24;border-color:#9d7665;background:#f0dfc8}
+.section{margin:24px 0 0;position:relative}
+.section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--rule-dark);padding-bottom:8px;margin-bottom:13px}
+.section-heading h2{font-weight:normal;font-size:1.35rem;margin:0;color:var(--brown-dark)}
+.section-heading small{font-size:.77rem;color:var(--faded);font-style:italic}
+.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.folder{
+ min-height:84px;display:flex;align-items:center;gap:11px;padding:11px 12px;text-align:left;
+ border:1px solid var(--rule);border-radius:2px;background:#efe3c9;color:var(--ink);
+ position:relative;box-shadow:0 1px 2px rgba(50,34,20,.06);transition:background .12s,border-color .12s;
+}
+.folder:before{content:"";position:absolute;top:-1px;left:12px;width:39px;height:5px;background:#d6c19a;border:1px solid var(--rule);border-bottom:0}
+.folder:hover,.folder.active{background:#e4d1ad;border-color:var(--brown)}
+.folder.active{outline:1px solid var(--rule-dark);outline-offset:-4px}
+.folder-mark{flex:0 0 31px;width:31px;height:27px;border:1px solid #9b805a;background:#e3d0aa;display:grid;place-items:center;color:#65462c;font-size:1rem}
+.folder-title{font-size:.98rem;display:block;line-height:1.2}
+.folder-count{display:block;font-size:.73rem;color:var(--faded);margin-top:4px}
+.controls{
+ display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:9px;padding:12px;
+ border:1px solid var(--rule);background:#f0e5cc;margin-bottom:14px;
+}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft)}
+input,select,textarea{
+ width:100%;border:1px solid #b5a07d;border-radius:1px;background:#fff9eb;color:var(--ink);
+ padding:9px 10px;min-width:0;outline-color:var(--brown)
+}
+textarea{min-height:105px;resize:vertical}
+.search-row{display:flex;gap:8px;align-items:end}
+.search-row .field{flex:1}
+.timeline-summary{font-size:.82rem;color:var(--faded);margin:0 0 12px}
+.timeline{border-left:2px solid var(--rule-dark);margin-left:57px;padding-left:20px}
+.year-group{position:relative;margin:18px 0 24px}
+.year-label{font-size:1.18rem;font-weight:normal;color:var(--brown-dark);margin:0 0 10px;position:relative}
+.year-label:before{content:"";position:absolute;width:9px;height:9px;background:var(--brown);border:2px solid var(--paper-light);border-radius:50%;left:-27px;top:6px}
+.record{
+ position:relative;background:#f7efdD;border:1px solid #c8b48f;padding:13px 14px;margin:0 0 10px;
+ box-shadow:0 1px 2px rgba(50,34,20,.05)
+}
+.record:before{content:"";position:absolute;left:-27px;top:19px;width:12px;border-top:1px solid var(--rule-dark)}
+.record-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.record-title{font-size:1.05rem;margin:0 0 5px;font-weight:normal}
+.record-meta{font-size:.8rem;color:var(--ink-soft);line-height:1.55}
+.record-type{display:inline-block;border:1px solid #b9a27c;padding:3px 6px;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brown);white-space:nowrap}
+.record-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.record-details{border-top:1px dashed var(--rule);margin-top:10px;padding-top:10px;white-space:pre-wrap;font-size:.9rem;line-height:1.5}
+.record-details[hidden]{display:none}
+.empty{padding:25px;text-align:center;border:1px dashed var(--rule-dark);color:var(--faded);font-style:italic;background:#f4e9d0}
+.footer{margin-top:26px;border-top:3px double var(--rule-dark);padding-top:13px;text-align:center;color:var(--faded);font-size:.76rem;line-height:1.6}
+.modal-backdrop{position:fixed;inset:0;background:rgba(38,25,15,.62);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal-backdrop.open{display:flex}
+.modal{width:min(660px,100%);max-height:92vh;overflow:auto;background:var(--paper-light);border:2px solid var(--rule-dark);box-shadow:0 12px 45px rgba(0,0,0,.3);padding:23px;position:relative}
+.modal:before{content:"";position:absolute;inset:6px;border:1px solid var(--rule);pointer-events:none}
+.modal-content{position:relative}
+.modal h2{font-weight:normal;font-size:1.45rem;border-bottom:1px solid var(--rule-dark);padding-bottom:9px;margin-bottom:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .wide{grid-column:1/-1}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
+.hint{font-size:.76rem;color:var(--faded);margin:5px 0 0}
+.keypad-wrap{max-width:320px;margin:0 auto;text-align:center}
+.lock-title{font-size:1.3rem;font-weight:normal;margin:0 0 5px}
+.pin-display{height:42px;letter-spacing:.55em;font-size:1.5rem;margin:15px auto;max-width:230px;border:1px solid var(--rule-dark);background:#fdf5e5;padding:6px}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px auto;max-width:260px}
+.key{padding:12px 8px;font-size:1.05rem;background:#e9d9b8;border:1px solid var(--rule-dark);color:var(--brown-dark)}
+.key:hover{background:#d9c39a}
+.key.wide{grid-column:span 2}
+.pin-message{min-height:1.2em;color:var(--red-ink);font-size:.83rem;margin:9px 0}
+.signed-in{color:#4d5b36;font-size:.82rem}
+.file-link{display:inline-block;margin-top:5px}
+@media(max-width:760px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.controls{grid-template-columns:1fr 1fr}.timeline{margin-left:42px;padding-left:17px}.record:before{left:-23px}.year-label:before{left:-24px}}
+@media(max-width:480px){.page{padding:0 8px;margin:8px auto}.sheet{padding:16px 12px}.gallery{gap:7px}.folder{min-height:76px;padding:10px 8px;gap:8px}.folder-mark{width:27px;flex-basis:27px}.folder-title{font-size:.88rem}.controls{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.record-top{display:block}.record-type{margin-top:7px}.timeline{margin-left:32px;padding-left:13px}.record:before{left:-19px}.year-label:before{left:-20px}}
+
+/* Refined burgundy archive styling */
+:root{
+ --paper:#dfd0b6; --paper-light:#f0e4d0; --paper-deep:#cbb394;
+ --ink:#2c211f; --ink-soft:#58403d; --faded:#806763; --rule:#b49a88;
+ --rule-dark:#76514f; --brown:#743b43; --brown-dark:#49262e;
+ --red-ink:#7a2635; --shadow:rgba(39,18,22,.19);
+}
+body{
+ color:var(--ink);font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+ background-color:#b9a28f;
+ background-image:radial-gradient(ellipse at top,rgba(255,245,227,.28),transparent 65%),
+ repeating-linear-gradient(0deg,rgba(54,27,29,.035) 0,rgba(54,27,29,.035) 1px,transparent 1px,transparent 5px);
+}
+.page{max-width:1160px;margin:30px auto}
+.sheet{background:var(--paper-light);border:1px solid #68464a;border-radius:17px;box-shadow:0 12px 34px var(--shadow);padding:clamp(20px,3.2vw,38px);overflow:hidden}
+.sheet:before{inset:9px;border:1px solid rgba(118,81,79,.42);border-radius:11px}
+.masthead{padding:14px 16px 23px;border-bottom:3px double var(--rule-dark)}
+.kicker{font-family:Georgia,serif;font-size:.7rem;letter-spacing:.22em;color:var(--red-ink)}
+h1{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-size:clamp(2.25rem,5.3vw,3.65rem);font-weight:600;letter-spacing:.012em;color:#4a242c;text-shadow:0 1px rgba(255,255,255,.55)}
+.subtitle{font-size:1.07rem;color:#694e4a}
+.ornament{color:#8c4650;letter-spacing:.55em}
+.btn{border:1px solid #896368;background:#e4d1bc;color:#4b2930;padding:10px 15px;border-radius:9px;box-shadow:0 2px 4px rgba(50,20,24,.08);transition:transform .15s,background .15s,box-shadow .15s}
+.btn:hover{background:#d8b9ad;box-shadow:0 4px 9px rgba(50,20,24,.12);transform:translateY(-1px)}
+.btn.primary{background:#743b43;color:#fff3e6;border-color:#49262e}.btn.primary:hover{background:#5d2d36}
+.btn.danger{color:#762637;border-color:#a57a7b;background:#ead5ca}
+.section-heading{border-bottom:1px solid #987778;padding-bottom:10px}
+.section-heading h2{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-weight:600;color:#512831;font-size:1.45rem}
+.gallery{gap:12px}
+.folder{min-height:98px;gap:13px;padding:15px 16px;border:1px solid #b39a8a;border-radius:13px;background:linear-gradient(145deg,#eadbc5,#e2cfb7);color:var(--ink);box-shadow:0 3px 8px rgba(48,23,27,.07);transition:transform .16s,background .16s,border-color .16s,box-shadow .16s}
+.folder:before{content:none}
+.folder:hover,.folder.active{background:linear-gradient(145deg,#dfc3b3,#d5b1a7);border-color:#8b4a53;box-shadow:0 5px 13px rgba(58,24,31,.13);transform:translateY(-2px)}
+.folder.active{outline:2px solid rgba(116,59,67,.22);outline-offset:-4px}
+.folder-mark{flex:0 0 36px;width:36px;height:36px;border:1px solid #a87b7c;border-radius:10px;background:#743b43;color:#fff0e4;display:grid;place-items:center;font-family:Georgia,serif;font-size:.8rem;box-shadow:inset 0 1px rgba(255,255,255,.18)}
+.folder:nth-child(1) .folder-mark:after{content:"01"}.folder:nth-child(2) .folder-mark:after{content:"02"}.folder:nth-child(3) .folder-mark:after{content:"03"}.folder:nth-child(4) .folder-mark:after{content:"04"}.folder:nth-child(5) .folder-mark:after{content:"05"}.folder:nth-child(6) .folder-mark:after{content:"06"}
+.folder-title{font-size:1.02rem;font-weight:600;letter-spacing:.005em;color:#48272d}
+.folder-count{font-size:.75rem;color:#795e5a}
+.controls{gap:11px;padding:15px;border:1px solid #b49a88;border-radius:13px;background:#e7d7c1;margin-bottom:16px}
+input,select,textarea{border:1px solid #b49a88;border-radius:8px;background:#f8efe1;color:var(--ink);padding:10px 11px;outline-color:#8b4a53}
+input:focus,select:focus,textarea:focus{border-color:#8b4a53;box-shadow:0 0 0 3px rgba(116,59,67,.12)}
+.timeline{border-left:2px solid #987778}
+.year-label{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:1.27rem;font-weight:600;color:#512831}
+.year-label:before{background:#743b43}
+.record{background:#f6ebdb;border:1px solid #c8b09a;border-radius:12px;padding:15px 17px;box-shadow:0 3px 8px rgba(48,23,27,.06)}
+.record-title{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:1.12rem;font-weight:600;color:#4b272f}
+.record-type{border:1px solid #b58b8c;border-radius:999px;padding:4px 9px;color:#743b43;background:#f0dfd4;font-size:.66rem}
+.record-details{border-top:1px dashed #b49a88}
+.empty{border:1px dashed #987778;border-radius:12px;background:#e9d9c3;color:#775b58}
+.footer{border-top:3px double #987778;color:#806763}
+.modal-backdrop{background:rgba(37,17,22,.72);backdrop-filter:blur(3px)}
+.modal{border:2px solid #76514f;border-radius:16px;background:#f0e4d0;box-shadow:0 18px 55px rgba(0,0,0,.36)}
+.modal:before{inset:7px;border-radius:10px}
+.modal h2{color:#512831;border-bottom:1px solid #987778}
+.pin-display{border:1px solid #987778;border-radius:8px;background:#fbf1e2}
+.key{padding:13px 8px;background:#e4d1bc;border:1px solid #987778;border-radius:9px;color:#49262e;transition:background .12s}
+.key:hover{background:#d7b8aa}
+@media(max-width:480px){.page{margin:10px auto}.sheet{padding:18px 13px;border-radius:13px}.sheet:before{inset:6px;border-radius:9px}.folder{min-height:82px;padding:11px 10px;gap:9px;border-radius:11px}.folder-mark{width:30px;flex-basis:30px;height:32px;border-radius:8px}.folder-title{font-size:.9rem}}
+
+
+/* Deep oxblood and walnut archive theme */
+:root{
+ --paper:#b9a58d;--paper-light:#d2bea4;--paper-deep:#9f876e;
+ --ink:#241817;--ink-soft:#49302e;--faded:#6d504d;--rule:#92716d;
+ --rule-dark:#583137;--brown:#642b36;--brown-dark:#35171e;
+ --red-ink:#6d1f2d;--shadow:rgba(24,8,12,.28);
+}
+body{background-color:#5c4541;background-image:radial-gradient(ellipse at top,rgba(205,177,147,.12),transparent 65%),repeating-linear-gradient(0deg,rgba(25,10,12,.09) 0,rgba(25,10,12,.09) 1px,transparent 1px,transparent 5px);color:var(--ink)}
+.sheet{background:var(--paper-light);border-color:#4c252c;box-shadow:0 16px 42px rgba(15,5,8,.42)}
+.sheet:before{border-color:rgba(88,49,55,.6)}
+h1{color:#35171e;text-shadow:0 1px rgba(255,239,219,.28)}
+.kicker,.ornament{color:#692a37}.subtitle{color:#543936}.small-note,.folder-count,.timeline-summary,.footer{color:#654744}
+.btn{background:#bda58c;border-color:#75514e;color:#35171e;border-radius:12px;box-shadow:0 3px 8px rgba(30,10,13,.12)}
+.btn:hover{background:#a98d78;box-shadow:0 5px 12px rgba(30,10,13,.2)}
+.btn.primary{background:#642b36;color:#f2dfc9;border-color:#35171e}.btn.primary:hover{background:#4b2029}
+.btn.danger{color:#681e2b;background:#c4a394;border-color:#855d5c}
+.section-heading{border-color:#80595a}.section-heading h2,.year-label{color:#3d1d24}
+.gallery{gap:13px}
+.folder{background:#c4ad92;border-color:#98786b;border-radius:16px;box-shadow:0 5px 13px rgba(38,13,18,.13);padding:15px 16px;transition:transform .18s,background .18s,box-shadow .18s}
+.folder:before{background:#7b3a43;border-color:#6a3038;border-radius:4px 4px 0 0;height:5px}
+.folder:hover,.folder.active{background:#b3947c;border-color:#642b36;box-shadow:0 8px 18px rgba(38,13,18,.2);transform:translateY(-2px)}
+.folder.active{outline:1px solid #642b36;outline-offset:-4px}
+.folder-mark{background:#642b36;border-color:#4b2029;color:#f2dfc9;border-radius:11px;width:38px;flex-basis:38px;height:38px;font-family:Georgia,serif;box-shadow:inset 0 1px rgba(255,255,255,.12)}
+.folder-title{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;color:#35171e;font-size:1.08rem}
+.controls{background:#bba187;border-color:#8d6d65;border-radius:15px}
+input,select,textarea{background:#dfcbb1;border-color:#96786b;border-radius:10px;color:#281919}
+input:focus,select:focus,textarea:focus{border-color:#642b36;box-shadow:0 0 0 3px rgba(100,43,54,.2)}
+.timeline{border-left-color:#80595a}.year-label:before{background:#642b36}
+.record{background:#d9c4a8;border-color:#a48a73;border-radius:15px;box-shadow:0 4px 12px rgba(38,13,18,.1)}
+.record-title{color:#3b1b23}.record-type{background:#b9958a;border-color:#8a5c61;color:#4b2028}
+.record-details{border-color:#987a6d}.empty{background:#c6ad92;border-color:#80595a;color:#654744;border-radius:15px}
+.footer{border-color:#80595a}.modal{background:#d2bea4;border-color:#583137;border-radius:20px}.modal:before{border-color:#92716d;border-radius:13px}
+.modal h2{color:#3d1d24;border-color:#80595a}.pin-display{background:#dfcbb1;border-color:#80595a;border-radius:10px}.key{background:#bda58c;border-color:#80595a;border-radius:11px;color:#35171e}.key:hover{background:#a98d78}
+.signed-in{color:#3e4a2b;font-weight:600}
+#ownerStatus{max-width:100%;line-height:1.5}
+@media(max-width:480px){.folder{border-radius:13px}.folder-mark{border-radius:9px}}
+
+</style>
+</head>
+<body>
+<div class="page">
+ <main class="sheet">
+  <header class="masthead">
+   <div class="kicker">Private Family Archive · Established for the Tylka Family</div>
+   <h1>Tylka Genealogical Log</h1>
+   <div class="ornament">— ✦ —</div>
+   <p class="subtitle">A register of births, marriages, deaths, migrations, and family memory</p>
+  </header>
+  <div class="topline">
+   <button class="btn" id="ownerButton" type="button">Owner Sign-In</button>
+   <span id="ownerStatus" class="small-note">Visitor mode · Browse and search the complete archive; sign in to add or manage records.</span>
+   <div style="display:flex;gap:7px;flex-wrap:wrap">
+    <button class="btn" id="exportBtn" type="button">Export Register</button>
+    <button class="btn" id="importBtn" type="button">Import Backup</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+   </div>
+  </div>
+
+  <section class="section">
+   <div class="section-heading"><h2>Index of Records</h2><small>Choose a register to narrow the entries</small></div>
+   <div class="gallery" id="gallery">
+    <button class="folder" data-category="Births"><span class="folder-mark" aria-hidden="true"></span><span><span class="folder-title">Births & Baptisms</span><span class="folder-count" id="count-Births">0 entries</span></span></button>
+    <button class="folder" data-category="Deaths"><span class="folder-mark" aria-hidden="true"></span><span><span class="folder-title">Deaths & Burials</span><span class="folder-count" id="count-Deaths">0 entries</span></span></button>
+    <button class="folder" data-category="Marriages"><span class="folder-mark" aria-hidden="true"></span><span><span class="folder-title">Marriages</span><span class="folder-count" id="count-Marriages">0 entries</span></span></button>
+    <button class="folder" data-category="Immigration"><span class="folder-mark" aria-hidden="true"></span><span><span class="folder-title">Immigration & Travel</span><span class="folder-count" id="count-Immigration">0 entries</span></span></button>
+    <button class="folder" data-category="Family Photos"><span class="folder-mark" aria-hidden="true"></span><span><span class="folder-title">Family Photographs</span><span class="folder-count" id="count-Family Photos">0 entries</span></span></button>
+    <button class="folder" data-category="Sources"><span class="folder-mark" aria-hidden="true"></span><span><span class="folder-title">Sources & Documents</span><span class="folder-count" id="count-Sources">0 entries</span></span></button>
+   </div>
+  </section>
+
+  <section class="section">
+   <div class="section-heading"><h2>Chronological Register</h2><small>Entries arrange by date automatically</small></div>
+   <div class="controls">
+    <div class="field"><label for="searchText">Search names, places, notes</label><input id="searchText" type="search" placeholder="e.g. Tylka, Kraków, parish…"></div>
+    <div class="field"><label for="filterCategory">Record class</label><select id="filterCategory"><option value="">All classes</option><option>Births</option><option>Deaths</option><option>Marriages</option><option>Immigration</option><option>Family Photos</option><option>Sources</option></select></div>
+    <div class="field"><label for="dateFrom">From date</label><input id="dateFrom" type="date"></div>
+    <div class="field"><label for="dateTo">To date</label><input id="dateTo" type="date"></div>
+   </div>
+   <p class="timeline-summary" id="timelineSummary">0 records in the register.</p>
+   <div id="timeline"></div>
+  </section>
+
+  <footer class="footer">
+   <div>TYLKA FAMILY PAPERS · PARISH AND CIVIL RECORD INDEX</div>
+   <div>Preserve the source, record the place, and distinguish fact from family tradition.</div>
+   <div id="storageStatus">Entries are saved in this browser on this device.</div>
+  </footer>
+ </main>
+</div>
+
+<div class="modal-backdrop" id="ownerModal" role="dialog" aria-modal="true" aria-labelledby="ownerModalTitle">
+ <div class="modal"><div class="modal-content">
+  <h2 id="ownerModalTitle">Owner's Key</h2>
+  <div class="keypad-wrap">
+   <p class="lock-title">Enter the archive key</p>
+   <p class="small-note">The register is reserved for its owner.</p>
+   <div class="pin-display" id="pinDisplay" aria-label="Entered digits"></div>
+   <div class="keypad" id="keypad">
+    <button class="key" data-key="1">1</button><button class="key" data-key="2">2</button><button class="key" data-key="3">3</button>
+    <button class="key" data-key="4">4</button><button class="key" data-key="5">5</button><button class="key" data-key="6">6</button>
+    <button class="key" data-key="7">7</button><button class="key" data-key="8">8</button><button class="key" data-key="9">9</button>
+    <button class="key" data-key="clear">Clear</button><button class="key" data-key="0">0</button><button class="key" data-key="back">⌫</button>
+   </div>
+   <p id="pinMessage" class="pin-message" aria-live="polite"></p>
+   <div class="modal-actions" style="justify-content:center">
+    <button class="btn" id="cancelOwner" type="button">Cancel</button>
+    <button class="btn primary" id="submitPin" type="button">Unlock Register</button>
+   </div>
+  </div>
+ </div></div>
+</div>
+
+<div class="modal-backdrop" id="recordModal" role="dialog" aria-modal="true" aria-labelledby="recordModalTitle">
+ <div class="modal"><div class="modal-content">
+  <h2 id="recordModalTitle">Enter a New Record</h2>
+  <form id="recordForm">
+   <div class="form-grid">
+    <div class="field"><label for="recordCategory">Register</label><select id="recordCategory" required><option>Births</option><option>Deaths</option><option>Marriages</option><option>Immigration</option><option>Family Photos</option><option>Sources</option></select></div>
+    <div class="field"><label for="recordDate">Date</label><input id="recordDate" type="date"></div>
+    <div class="field wide"><label for="recordName">Record title</label><input id="recordName" required maxlength="180" placeholder="e.g. Baptism of Jan Tylka"></div>
+    <div class="field"><label for="recordLocation">Place / parish</label><input id="recordLocation" maxlength="180" placeholder="Village, parish, district"></div>
+    <div class="field"><label for="recordPeople">Persons named</label><input id="recordPeople" maxlength="240" placeholder="Names as written in the source"></div>
+    <div class="field wide"><label for="recordNotes">Transcription, source citation, or notes</label><textarea id="recordNotes" placeholder="Keep original spellings; note archive, parish, book, page, and uncertainties."></textarea></div>
+    <div class="field wide"><label for="recordFile">Attach scan, photograph, or document (up to 2 MB)</label><input id="recordFile" type="file" accept="image/*,.pdf,.txt,.doc,.docx"><p class="hint">Attachments are stored with the entry in this browser. Large scans should be kept in separate backups.</p></div>
+   </div>
+   <div class="modal-actions"><button class="btn" id="cancelRecord" type="button">Cancel</button><button class="btn primary" type="submit">Save to Register</button></div>
+  </form>
+ </div></div>
+</div>
+
+<script>
+(() => {
+ const STORAGE_KEY = 'tylkaGenealogicalRecords_v1';
+ const OWNER_PIN = '041309';
+ const categories = ['Births','Deaths','Marriages','Immigration','Family Photos','Sources'];
+ let records = [];
+ let signedIn = false;
+ let pin = '';
+ let activeFolder = '';
+ const $ = id => document.getElementById(id);
+ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const normalize = value => String(value ?? '').toLocaleLowerCase();
+ function loadRecords(){
+   try { const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); records = Array.isArray(parsed) ? parsed : []; }
+   catch(e){ records = []; }
+ }
+ function saveRecords(){
+   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); $('storageStatus').textContent='Entries are saved in this browser on this device.'; }
+   catch(e){ $('storageStatus').textContent='Browser storage is full. Export a backup and reduce large attachments.'; alert('Could not save the register. Browser storage may be full; export a backup and reduce attachment sizes.'); }
+ }
+ function formatDate(date){
+   if(!date) return 'Date not recorded';
+   const d = new Date(date + 'T00:00:00');
+   return isNaN(d) ? date : new Intl.DateTimeFormat('en-US',{year:'numeric',month:'long',day:'numeric'}).format(d);
+ }
+ function yearOf(r){ if(r.date && /^\d{4}/.test(r.date)) return r.date.slice(0,4); return 'Undated'; }
+ function render(){
+   categories.forEach(cat => {
+     const n=records.filter(r=>r.category===cat).length;
+     const node=$('count-'+cat);
+     if(node) node.textContent=`${n} ${n===1?'entry':'entries'}`;
+   });
+   document.querySelectorAll('.folder').forEach(b=>b.classList.toggle('active', b.dataset.category===activeFolder));
+   const query=normalize($('searchText').value.trim());
+   const category=$('filterCategory').value || activeFolder;
+   const from=$('dateFrom').value, to=$('dateTo').value;
+   const filtered=records.filter(r=>{
+     if(category && r.category!==category) return false;
+     if(from && (!r.date || r.date<from)) return false;
+     if(to && (!r.date || r.date>to)) return false;
+     const hay=normalize([r.title,r.location,r.people,r.notes,r.category,r.fileName].join(' '));
+     return !query || hay.includes(query);
+   }).sort((a,b)=>{
+     const ad=a.date || '0000-00-00', bd=b.date || '0000-00-00';
+     if(ad!==bd) return bd.localeCompare(ad);
+     return String(a.title||'').localeCompare(String(b.title||''));
+   });
+   $('timelineSummary').textContent=`Showing ${filtered.length} of ${records.length} ${records.length===1?'record':'records'}${category?' · '+category:''}.`;
+   const timeline=$('timeline');
+   if(!filtered.length){
+     timeline.innerHTML='<div class="empty">No entries match this search. Clear a filter or add a record to begin the register.</div>';
+     addRecordButton();
+     return;
+   }
+   const groups={};
+   filtered.forEach(r=>{const y=yearOf(r);(groups[y] ||= []).push(r);});
+   timeline.innerHTML=Object.keys(groups).sort((a,b)=>{
+     if(a==='Undated') return 1; if(b==='Undated') return -1; return b.localeCompare(a);
+   }).map(year=>`<section class="year-group"><h3 class="year-label">${esc(year==='Undated'?'Date not recorded':year)}</h3>${groups[year].map(r=>{
+     const id=esc(r.id);
+     const attachment=r.fileData ? `<a class="file-link" href="${r.fileData}" download="${esc(r.fileName||'archive-attachment')}">${esc(r.fileName||'Open attachment')}</a>` : '';
+     return `<article class="record">
+       <div class="record-top"><div><h4 class="record-title">${esc(r.title||'Untitled record')}</h4><div class="record-meta">${esc(formatDate(r.date))}${r.location?' · '+esc(r.location):''}${r.people?'<br>Persons: '+esc(r.people):''}</div></div><span class="record-type">${esc(r.category)}</span></div>
+       <div class="record-actions"><button class="btn quiet" type="button" data-detail="${id}">View details</button>${signedIn?`<button class="btn quiet" type="button" data-delete="${id}">Remove entry</button>`:''}</div>
+       <div class="record-details" id="details-${id}" hidden>${r.notes?'<strong>Notes / source</strong>\\n'+esc(r.notes)+'\\n':''}${attachment?'<strong>Attachment</strong>\\n'+attachment:''}${!r.notes&&!attachment?'No additional notes were entered.':''}</div>
+     </article>`;
+   }).join('')}</section>`).join('');
+   addRecordButton();
+ }
+ function addRecordButton(){
+   const existing=$('addRecordButton');
+   if(existing) existing.remove();
+   if(signedIn){
+     const b=document.createElement('button'); b.id='addRecordButton';b.className='btn primary';b.type='button';b.textContent='+ Enter a Record';b.style.marginTop='13px';
+     b.addEventListener('click',openRecordModal);$('timeline').appendChild(b);
+   }
+ }
+ function showModal(id){$(id).classList.add('open');}
+ function hideModal(id){$(id).classList.remove('open');}
+ function setSignedIn(value){
+   signedIn=value;
+   $('ownerButton').textContent=value?'Owner Sign-In · Signed In':'Owner Sign-In';
+   $('ownerStatus').textContent=value?'Owner mode · You can add, remove, and import records.':'Visitor mode · Browse and search the complete archive; sign in to add or manage records.';
+   $('ownerStatus').className=value?'signed-in':'small-note';
+   $('importBtn').disabled=!value;
+   $('importBtn').title=value?'Import a register backup':'Owner sign-in is required to import records';
+   $('importBtn').style.opacity=value?'1':'.48';
+   render();
+ }
+ function openRecordModal(){
+   if(!signedIn){alert('Please sign in as owner before entering a record.');return;}
+   $('recordForm').reset();showModal('recordModal');
+ }
+ $('ownerButton').addEventListener('click',()=>{
+   if(signedIn){if(confirm('Sign out of the archive?')) setSignedIn(false);return;}
+   pin='';$('pinDisplay').textContent='';$('pinMessage').textContent='';showModal('ownerModal');
+ });
+ $('cancelOwner').addEventListener('click',()=>hideModal('ownerModal'));
+ $('keypad').addEventListener('click',e=>{
+   const b=e.target.closest('[data-key]');if(!b)return;
+   const key=b.dataset.key;
+   if(key==='clear') pin='';
+   else if(key==='back') pin=pin.slice(0,-1);
+   else if(pin.length<6) pin+=key;
+   $('pinDisplay').textContent='•'.repeat(pin.length);
+   $('pinMessage').textContent='';
+ });
+ function submitPin(){
+   if(pin===OWNER_PIN){hideModal('ownerModal');setSignedIn(true);pin='';}
+   else{$('pinMessage').textContent='Key not recognized. Please try again.';pin='';$('pinDisplay').textContent='';}
+ }
+ $('submitPin').addEventListener('click',submitPin);
+ $('pinDisplay').addEventListener('keydown',e=>{if(e.key==='Enter')submitPin();});
+ document.addEventListener('keydown',e=>{
+   if(e.key==='Escape'){hideModal('ownerModal');hideModal('recordModal');}
+   if($('ownerModal').classList.contains('open') && /^[0-9]$/.test(e.key) && pin.length<6){pin+=e.key;$('pinDisplay').textContent='•'.repeat(pin.length);}
+   if($('ownerModal').classList.contains('open') && e.key==='Backspace'){pin=pin.slice(0,-1);$('pinDisplay').textContent='•'.repeat(pin.length);}
+   if($('ownerModal').classList.contains('open') && e.key==='Enter')submitPin();
+ });
+ $('cancelRecord').addEventListener('click',()=>hideModal('recordModal'));
+ $('recordForm').addEventListener('submit',async e=>{
+   e.preventDefault();if(!signedIn)return;
+   const file=$('recordFile').files[0];
+   if(file && file.size>2*1024*1024){alert('Please choose an attachment smaller than 2 MB.');return;}
+   let fileData='';
+   if(file){fileData=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});}
+   const record={
+    id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2)),
+    category:$('recordCategory').value,date:$('recordDate').value,title:$('recordName').value.trim(),
+    location:$('recordLocation').value.trim(),people:$('recordPeople').value.trim(),notes:$('recordNotes').value.trim(),
+    fileName:file?file.name:'',fileData,createdAt:new Date().toISOString()
+   };
+   records.push(record);saveRecords();hideModal('recordModal');render();
+ });
+ $('timeline').addEventListener('click',e=>{
+   const detail=e.target.closest('[data-detail]');
+   if(detail){const node=$('details-'+detail.dataset.detail);if(node)node.hidden=!node.hidden;return;}
+   const del=e.target.closest('[data-delete]');
+   if(del && signedIn){const r=records.find(x=>x.id===del.dataset.delete);if(r&&confirm(`Remove “${r.title}” from the register? This cannot be undone unless you have a backup.`)){records=records.filter(x=>x.id!==r.id);saveRecords();render();}}
+ });
+ document.querySelectorAll('.folder').forEach(b=>b.addEventListener('click',()=>{
+   activeFolder=activeFolder===b.dataset.category?'':b.dataset.category;
+   $('filterCategory').value=activeFolder;render();
+ }));
+ ['searchText','filterCategory','dateFrom','dateTo'].forEach(id=>$(id).addEventListener(id==='searchText'?'input':'change',()=>{
+   if(id==='filterCategory')activeFolder=$('filterCategory').value;
+   render();
+ }));
+ $('exportBtn').addEventListener('click',()=>{
+   const blob=new Blob([JSON.stringify({format:'Tylka Genealogical Log Backup',version:1,exportedAt:new Date().toISOString(),records},null,2)],{type:'application/json'});
+   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='tylka-genealogical-backup.json';a.click();URL.revokeObjectURL(url);
+ });
+ $('importBtn').addEventListener('click',()=>{if(!signedIn){alert('Importing changes the register. Please sign in as owner first.');return;}$('importFile').click();});
+ $('importFile').addEventListener('change',async()=>{
+   const file=$('importFile').files[0];if(!file)return;if(!signedIn){alert('Owner sign-in is required to import records.');$('importFile').value='';return;}if(!signedIn){alert('Owner sign-in is required to import records.');$('importFile').value='';return;}
+   try{
+     const data=JSON.parse(await file.text());const incoming=Array.isArray(data)?data:data.records;
+     if(!Array.isArray(incoming))throw new Error('Backup did not contain a record list.');
+     if(!confirm(`Import ${incoming.length} records? Existing records with the same ID will be replaced; others will be retained.`))return;
+     const map=new Map(records.map(r=>[r.id,r]));incoming.forEach((r,i)=>{if(r&&typeof r==='object'){const id=r.id||('import-'+Date.now()+'-'+i);map.set(id,{...r,id,category:categories.includes(r.category)?r.category:'Sources'});}});
+     records=Array.from(map.values());saveRecords();render();alert('Backup imported.');
+   }catch(err){alert('Could not import this backup: '+err.message);}
+   finally{$('importFile').value='';}
+ });
+ document.querySelectorAll('.modal-backdrop').forEach(backdrop=>backdrop.addEventListener('click',e=>{if(e.target===backdrop)hideModal(backdrop.id);}));
+ loadRecords();render();
+})();
+</script>
+</body>
+</html>
